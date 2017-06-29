@@ -1,0 +1,5 @@
+#!/bin/bash
+
+dir=$(dirname "$0")
+dir=$(readlink -f "$dir")
+exec "$dir"/smtpd.pl 2> >(logger -p uucp.err -t messenger.smtpd)
