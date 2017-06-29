@@ -132,7 +132,7 @@ sub send_message
 
 sub array
 {
-	# Typecase non-array variable to array.
+	# Typecast non-array variable to array.
 	my $var = $_[0];
 	if(ref $var ne 'ARRAY') { $var = [$var]; }
 	return @$var;
