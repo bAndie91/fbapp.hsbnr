@@ -1,5 +1,25 @@
-Email headers considered
+
+Install
 ====
+
+   1. Create a Messenger Bot - https://developers.facebook.com/docs/messenger-platform/product-overview/launch
+   1. Complete `conf/app.ini`
+   1. Setup OS environment
+      1. setup CGI endpoint `callback.pl` in your favorite webserver
+      1. setup filesystem permissions using `setup-permissions` script
+      1. setup Messenger Persistent Menu using `setup-persistent-menu.pl`
+      1. configure SMTP connector using inetd
+   1. Start conversation with your bot
+
+Publishing notifications
+====
+
+  1. Send an Email by standard SMTP to the smtp listener you configuredfor inetd
+  1. `MAIL FROM`, `RCPT TO` does not matter
+  1. Plain and MIME multipart Emails are also supported
+
+Email headers considered
+----
 
  - `Subject`
  Enumerate semicolor-delimited topic names in Subject header.
