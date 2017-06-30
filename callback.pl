@@ -47,6 +47,7 @@ for my $entry (@{$apiobj->{'entry'}})
 		my $postback_payload = $messaging->{'postback'}->{'payload'};
 		my $quick_reply_payload = $messaging->{'message'}->{'quick_reply'}->{'payload'};
 		my $command = $postback_payload || $quick_reply_payload || $message_text;
+		my $subs_changed = 0;
 		
 		given($command)
 		{
@@ -64,6 +65,7 @@ for my $entry (@{$apiobj->{'entry'}})
 			{
 				delete $ini{'subscribe'}{$sender_id};
 				$ini{'unsubscribe'}{$sender_id} = POSIX::strftime('%FT%TZ%z', localtime);
+				$subs_changed = 1;
 				$subscribers_changed = 1;
 				push @responses, [$sender_id, "You are unsubscribed from all topics."];
 			}
@@ -105,6 +107,7 @@ for my $entry (@{$apiobj->{'entry'}})
 						if(scalar @subs != scalar @$new_topic_patterns)
 						{
 							$ini{'subscribe'}{$sender_id} = $new_topic_patterns;
+							$subs_changed = 1;
 							$subscribers_changed = 1;
 						}
 					}
@@ -114,14 +117,31 @@ for my $entry (@{$apiobj->{'entry'}})
 						my %new_topic_patterns = map {$_=>1} @topics, @subs;
 						delete $ini{'subscribe'}{$sender_id};
 						@{$ini{'subscribe'}{$sender_id}} = keys %new_topic_patterns;
+						$subs_changed = 1;
+						$subscribers_changed = 1;
 					}
-					$subscribers_changed = 1;
 				}
 				else
 				{
 					push @responses, [$sender_id, $unsub ? "What do you want to unsubscribe from?" : "What do you want to subscribe for?"];
 				}
 			}
+		}
+		
+		if($subs_changed)
+		{
+			push @responses, {
+				'recipient'=>{'id'=>$sender_id},
+				'message'=>{
+					'text' => "Your subscriptions are changed.",
+					'quick_replies' => [{
+						'title' => "My Subscriptions",
+						'content_type' => 'text',
+						'payload' => "LIST SUBS",
+						'image_url' => $ini{'quickbutton-icon-url'}{"LIST SUBS"},
+					}],
+				},
+			};
 		}
 	}
 }
@@ -134,5 +154,5 @@ if($subscribers_changed)
 
 for my $response (@responses)
 {
-	send_message($response);
+	send_message($response, {'parts'=>1});
 }

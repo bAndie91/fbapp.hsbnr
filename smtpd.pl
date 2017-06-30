@@ -92,7 +92,7 @@ sub cb_data
 			$mtext = substr $mtext, 0, $ini{'api'}{'charlimit'};
 		}
 		
-		if(send_message($uid, $mtext))
+		if(send_message([$uid, $mtext]))
 		{
 			$done_count++;
 		}

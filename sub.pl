@@ -1,6 +1,7 @@
 
 use Data::Dumper;
 use LWP::UserAgent;
+use Carp;
 
 
 sub expand_topics
@@ -87,11 +88,14 @@ sub update_ini
 
 sub send_message
 {
-	# Arguments variant 1
-	#  - recipient id
-	#  - message text
-	# Arguments variant 2
-	#  - message object hash
+	# Arguments
+	#  - ARRAY or HASH ref
+	#    - case ARRAY
+	#      - [0] recipient id
+	#      - [1] message text
+	#    - case HASH: the whole message object
+	#  - HASH ref of options
+	#    - parts: send any length message by splitting it into chunks
 	# Returns boolean
 	#  - TRUE on success
 	#  - FALSE on fail, sets $ERRORMESSAGE global
@@ -102,15 +106,15 @@ sub send_message
 		$msgobj->{'recipient'}->{'id'} = $_[0][0];
 		$msgobj->{'message'}->{'text'} = $_[0][1];
 	}
-	elsif(ref $_[0] eq '')
-	{
-		$msgobj->{'recipient'}->{'id'} = $_[0];
-		$msgobj->{'message'}->{'text'} = $_[1];
-	}
-	else
+	elsif(ref $_[0] eq 'HASH')
 	{
 		$msgobj = $_[0];
 	}
+	else
+	{
+		croak "invalid argument type";
+	}
+	my %opt = %{$_[1]};
 	
 	if(not defined $send_message_user_agent)
 	{
@@ -118,8 +122,17 @@ sub send_message
 	}
 	
 	my $url = "$ini{'api'}{'BaseURL'}/messages?access_token=$ini{'api'}{'PageAccessToken'}";
-	my $resp = $send_message_user_agent->post($url, 'Content-Type'=>'application/json', Content=>to_json($msgobj));
-	#print STDERR Dumper $resp->decoded_content;
+	my $resp;
+	for my $chunk ($opt{'parts'} ? (partitionize($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
+	{
+		$msgobj->{'message'}->{'text'} = $chunk;
+		$resp = $send_message_user_agent->post($url, 'Content-Type'=>'application/json', Content=>to_json($msgobj));
+		if(not $resp->is_success)
+		{
+			#print STDERR Dumper $resp->decoded_content;
+			last;
+		}
+	}
 	
 	if(not $resp->is_success)
 	{
@@ -143,6 +156,19 @@ sub get_subscriptions
 	my $uid = shift;
 	my @list = array($ini{'subscribe'}{$uid});
 	return sort grep {length} @list;
+}
+
+sub partitionize
+{
+	my $s = shift;
+	my $len = shift;
+	my @parts;
+	while(length $s)
+	{
+		push @parts, substr $s, 0, $len;
+		$s = substr $s, $len;
+	}
+	return @parts;
 }
 
 1;
