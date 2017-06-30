@@ -1,2 +1,5 @@
+USER=${SUDO_USER:-$USER}
+chown mail:$USER callback.pl
+chmod g+w callback.pl
 chown mail:mail /var/run/lock/fbapp.notify.lock
 setfacl -m default:u:$USER:rw-,default:u:mail:rw-,default:other::---,user:$USER:rwx,user:mail:rwx,other::r-x conf/
