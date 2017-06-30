@@ -37,6 +37,7 @@ sub cb_data
 	my $mail = Email::MIME->new($$data);
 	my $notifications = {};
 	my @smtp_responses;
+	my $want_parts = 0;
 	my $all_count;
 	my $done_count;
 	
@@ -87,12 +88,16 @@ sub cb_data
 	for my $uid (keys $notifications)
 	{
 		my $mtext = sprintf "%s\n[%s]", $message_text, join ';', @{$notifications->{$uid}};
-		if($mail->header('X-Uucphu-Notify-App-Want-Trim'))
+		if($mail->header('X-Uucphu-Notify-App-Want-Trim') or grep {/trim/i} @recipients)
 		{
 			$mtext = substr $mtext, 0, $ini{'api'}{'charlimit'};
 		}
+		elsif($mail->header('X-Uucphu-Notify-App-Want-Partitions') or grep {/part/i} @recipients)
+		{
+			$want_parts = 1;
+		}
 		
-		if(send_message([$uid, $mtext]))
+		if(send_message([$uid, $mtext], {'parts'=>$want_parts}))
 		{
 			$done_count++;
 		}

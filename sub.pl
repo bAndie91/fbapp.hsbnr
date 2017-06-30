@@ -123,7 +123,7 @@ sub send_message
 	
 	my $url = "$ini{'api'}{'BaseURL'}/messages?access_token=$ini{'api'}{'PageAccessToken'}";
 	my $resp;
-	for my $chunk ($opt{'parts'} ? (partitionize($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
+	for my $chunk ($opt{'parts'} ? (partitions($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
 	{
 		$msgobj->{'message'}->{'text'} = $chunk;
 		$resp = $send_message_user_agent->post($url, 'Content-Type'=>'application/json', Content=>to_json($msgobj));
@@ -158,7 +158,7 @@ sub get_subscriptions
 	return sort grep {length} @list;
 }
 
-sub partitionize
+sub partitions
 {
 	my $s = shift;
 	my $len = shift;

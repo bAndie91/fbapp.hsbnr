@@ -14,8 +14,10 @@ Install
 Publishing notifications
 ====
 
-  1. Send an Email by standard SMTP to the smtp listener you configuredfor inetd
+  1. Send an Email by standard SMTP to the smtp listener you configured inetd for
   1. `MAIL FROM`, `RCPT TO` does not matter
+     1. if any recipient contains substring `trim` then the message will be trimmed at char limit
+     1. if any recipient contains substring `part` then the message will be split into chunks
   1. Plain and MIME multipart Emails are also supported
 
 Email headers considered
@@ -26,6 +28,9 @@ Email headers considered
  
  - `X-Uucphu-Notify-App-Want-Trim: 1`
  Notify App will trim the message at the max length accepted by Messenger.
+
+ - `X-Uucphu-Notify-App-Want-Partitions: 1`
+ Notify App will split the message into max length sized chunks.
 
 Topic name syntax
 ====
