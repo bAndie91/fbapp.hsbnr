@@ -10,7 +10,7 @@ tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/notify/conf/app.ini", -nocas
 
 
 $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, });
-$url = "$ini{'api'}{'BaseURL'}/messenger_profile?access_token=$ini{'api'}{'PageAccessToken'}";
+$url = "$ini{'api'}{'BaseURL'}/me/messenger_profile?access_token=$ini{'api'}{'PageAccessToken'}";
 
 $resp = $ua->post($url, 'Content-Type'=>'application/json', Content=>to_json(
 {

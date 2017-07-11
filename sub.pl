@@ -121,7 +121,7 @@ sub send_message
 		$send_message_user_agent = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, });
 	}
 	
-	my $url = "$ini{'api'}{'BaseURL'}/messages?access_token=$ini{'api'}{'PageAccessToken'}";
+	my $url = "$ini{'api'}{'BaseURL'}/me/messages?access_token=$ini{'api'}{'PageAccessToken'}";
 	my $resp;
 	for my $chunk ($opt{'parts'} ? (partitions($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
 	{
@@ -137,7 +137,10 @@ sub send_message
 	if(not $resp->is_success)
 	{
 		print STDERR join "\n", grep {!/^((Cache-Control|Connection|Content-Length|Date|Pragma|Vary|WWW-Authenticate|Content-Type|Expires|Access-Control-Allow-Origin):|Client-SSL|$)/} split /\r?\n/, $resp->as_string;
-		$ERRORMESSAGE = from_json($resp->content)->{'error'}->{'message'};
+		eval {
+			$ERRORMESSAGE = from_json($resp->content)->{'error'}->{'message'};
+			1;
+		};
 		return 0;
 	}
 	return 1;

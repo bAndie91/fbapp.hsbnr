@@ -33,7 +33,8 @@ if($_GET{'hub.mode'} eq 'subscribe')
 
 ($RAWPOST) = (keys %_POST);
 eval {
-	$apiobj = from_json($RAWPOST); 1;
+	$apiobj = from_json($RAWPOST);
+	1;
 }
 or die $@.'POST: '.Dumper(\%_POST);
 
@@ -140,6 +141,14 @@ for my $entry (@{$apiobj->{'entry'}})
 		if(not exists $ini{'user-joined'}{$sender_id})
 		{
 			$ini{'user-joined'}{$sender_id} = datetime_iso8601();
+			my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, });
+			my $resp = $ua->get("$ini{'api'}{'BaseURL'}/$sender_id?access_token=$ini{'api'}{'PageAccessToken'}");
+			eval {
+				my $user = from_json($resp->decoded_content);
+				$ini{'user-name'}{$sender_id} = sprintf '%s %s %s', $user->{'first_name'}, $user->{'middle_name'}, $user->{'last_name'};
+				$ini{'user-locale'}{$sender_id} = $user->{'locale'};
+				1;
+			} or print STDERR $@;
 			$subscribers_changed = 1;
 		}
 		
