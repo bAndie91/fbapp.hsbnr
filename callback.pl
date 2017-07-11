@@ -32,7 +32,11 @@ if($_GET{'hub.mode'} eq 'subscribe')
 }
 
 ($RAWPOST) = (keys %_POST);
-$apiobj = from_json($RAWPOST);
+eval {
+	$apiobj = from_json($RAWPOST); 1;
+}
+or die $@.'POST: '.Dumper(\%_POST);
+
 #print STDERR Dumper $apiobj;
 $subscribers_changed = 0;
 @responses = ();
@@ -43,6 +47,11 @@ for my $entry (@{$apiobj->{'entry'}})
 	for my $messaging (@{$entry->{'messaging'}})
 	{
 		my $sender_id = $messaging->{'sender'}->{'id'};
+		if($sender_id !~ /^\d+$/)
+		{
+			# Not a Facebook Id
+			next;
+		}
 		my $message_text = $messaging->{'message'}->{'text'};
 		my $postback_payload = $messaging->{'postback'}->{'payload'};
 		my $quick_reply_payload = $messaging->{'message'}->{'quick_reply'}->{'payload'};
