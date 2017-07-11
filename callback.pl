@@ -73,7 +73,7 @@ for my $entry (@{$apiobj->{'entry'}})
 			when(/^UNSUB ALL/i)
 			{
 				delete $ini{'subscribe'}{$sender_id};
-				$ini{'unsubscribe'}{$sender_id} = POSIX::strftime('%FT%TZ%z', localtime);
+				$ini{'unsubscribe'}{$sender_id} = datetime_iso8601();
 				$subs_changed = 1;
 				$subscribers_changed = 1;
 				push @responses, [$sender_id, "You are unsubscribed from all topics."];
@@ -135,6 +135,12 @@ for my $entry (@{$apiobj->{'entry'}})
 					push @responses, [$sender_id, $unsub ? "What do you want to unsubscribe from?" : "What do you want to subscribe for?"];
 				}
 			}
+		}
+		
+		if(not exists $ini{'user-joined'}{$sender_id})
+		{
+			$ini{'user-joined'}{$sender_id} = datetime_iso8601();
+			$subscribers_changed = 1;
 		}
 		
 		if($subs_changed)

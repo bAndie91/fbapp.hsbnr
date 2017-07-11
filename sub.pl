@@ -171,4 +171,9 @@ sub partitions
 	return @parts;
 }
 
+sub datetime_iso8601
+{
+	return POSIX::strftime('%FT%TZ%z', localtime);
+}
+
 1;
