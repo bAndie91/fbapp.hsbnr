@@ -4,9 +4,9 @@ use Cwd;
 use Config::IniFiles;
 use JSON;
 use LWP::UserAgent;
-require "/opt/fbapp/notify/sub.pl";
+require "/opt/fbapp/hsbnr/sub.pl";
 
-tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/notify/conf/app.ini", -nocase => 1, -nomultiline => 1);
+tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/hsbnr/conf/app.ini", -nocase => 1, -nomultiline => 1);
 
 
 $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, });

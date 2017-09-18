@@ -10,9 +10,9 @@ use Config::IniFiles;
 use JSON;
 use POSIX;
 require "/usr/share/libcgi-yazzy/cgi.pl";
-require "/opt/fbapp/notify/sub.pl";
+require "/opt/fbapp/hsbnr/sub.pl";
 
-tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/notify/conf/app.ini", -nocase => 1, -nomultiline => 1);
+tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/hsbnr/conf/app.ini", -nocase => 1, -nomultiline => 1);
 
 
 #print STDERR Dumper {'POST'=>\%_POST, 'GET'=>\%_GET,};

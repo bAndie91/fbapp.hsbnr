@@ -1,6 +1,7 @@
 
-Install
-====
+# Hierarchic Subscription Based News Relay
+
+## Install
 
    1. Create a Messenger Bot - https://developers.facebook.com/docs/messenger-platform/product-overview/launch
    1. Complete `conf/app.ini`
@@ -11,8 +12,7 @@ Install
       1. configure SMTP connector using inetd
    1. Start conversation with your bot
 
-Publishing notifications
-====
+## Publishing notifications
 
   1. Send an Email by standard SMTP to the smtp listener you configured inetd for
   1. `MAIL FROM`, `RCPT TO` does not matter
@@ -20,28 +20,27 @@ Publishing notifications
      1. if any recipient contains substring `part` then the message will be split into chunks
   1. Plain and MIME multipart Emails are also supported
 
-Email headers considered
-----
+### Email headers considered
 
- - `Subject`
+ - `X-HSBNR-Topic`, `Subject`
  Enumerate semicolor-delimited topic names in Subject header.
  
- - `X-Uucphu-Notify-App-Want-Trim: 1`
+ - `X-HSBNR-Want-Trim: 1`
  Notify App will trim the message at the max length accepted by Messenger.
 
- - `X-Uucphu-Notify-App-Want-Partitions: 1`
+ - `X-HSBNR-Want-Partitions: 1`
  Notify App will split the message into max length sized chunks.
 
-Topic name syntax
-====
+ - `X-HSBNR-Metric`
+
+## Topic name syntax
 
 Topic name can be any string with the following semantics.
-Topics are hierarchical sequence of dot-delimited labels (like DNS, but in reverse direction).
+Topics are hierarchical sequence of dot-delimited labels (like DNS, but in reverse order).
 Separate multiple topics with semicolon.
 Separate multiple labels with comma to refer to multiple topics with one or more common labels.
 
-Examples for publishing notifications
-----
+### Examples for publishing notifications
 
  - `system.alert.service.httpd`
  - `system.alert.service.httpd,smtpd,imapd` expands to
@@ -52,8 +51,7 @@ Examples for publishing notifications
    - `system.alert.service.httpd`
    - `user.apache`
 
-Examples to subscribe notifications
-----
+### Examples to subscribe notifications
 
  - `system.alert`
    - matches to
