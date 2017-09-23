@@ -70,7 +70,7 @@ sub cb_data
 		return if $part->subparts;
 		if($part->content_type =~ m[^text/plain\b]i)
 		{
-			$message_text = $part->body_str;
+			$message_text = $part->body;
 			$message_text =~ s/^\s*//;
 			$message_text =~ s/\s*$//;
 		}
