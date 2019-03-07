@@ -89,13 +89,13 @@ sub update_ini
 sub send_message
 {
 	# Arguments
-	#  - ARRAY or HASH ref
-	#    - case ARRAY
-	#      - [0] recipient id
-	#      - [1] message text
+	#  - [0]: an ARRAY or a HASH ref
+	#    - case ARRAY:
+	#      - [0]: recipient id
+	#      - [1]: message text
 	#    - case HASH: the whole message object
-	#  - HASH ref of options
-	#    - parts: send any length message by splitting it into chunks
+	#  - [1]: a HASH ref of options
+	#    - parts (boolean) : whether send any length message by splitting it into chunks
 	# Returns boolean
 	#  - TRUE on success
 	#  - FALSE on fail, sets $ERRORMESSAGE global
@@ -163,14 +163,25 @@ sub get_subscriptions
 
 sub partitions
 {
-	my $s = shift;
-	my $len = shift;
+	my $remaining_str = shift;
+	my $max_len = shift;
+	my $boundary_char = shift;
+	$boundary_char = "\n" unless defined $boundary_char;
 	my @parts;
-	# TODO partitionize on line boundaries
-	while(length $s)
+	# TODO partition prefix and suffixes
+	while(length $remaining_str)
 	{
-		push @parts, substr $s, 0, $len;
-		$s = substr $s, $len;
+		my $chunk = substr $remaining_str, 0, $max_len;
+		if(length $boundary_char)
+		{
+			$pos = rindex $remaining_str, $boundary_char;
+			if($pos >= 0)
+			{
+				$chunk = substr $remaining_str, 0, $pos;
+			}
+		}
+		push @parts, $chunk;
+		$remaining_str = substr $remaining_str, length $chunk;
 	}
 	return @parts;
 }
