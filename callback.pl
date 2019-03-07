@@ -11,6 +11,7 @@ use JSON;
 use POSIX;
 require "/usr/share/libcgi-yazzy/cgi.pl";
 require "/opt/fbapp/hsbnr/sub.pl";
+require "/opt/fbapp/hsbnr/hash2tree.pl";
 
 tie %ini, 'Config::IniFiles', (-file => "/opt/fbapp/hsbnr/conf/app.ini", -nocase => 1, -nomultiline => 1);
 
@@ -68,7 +69,7 @@ for my $entry (@{$apiobj->{'entry'}})
 			}
 			when(/^LIST TOPICS/i)
 			{
-				my $list = join "\n", map {"☐ $_"} sort keys $ini{'topic'};
+				my $list = hash2tree(hash_of_delimited_strings_to_nested_hash({map {$_=>undef} keys $ini{'topic'}}));
 				push @responses, [$sender_id, $list ? "Known topics:\n$list" : "There is no known topic."];
 			}
 			when(/^UNSUB ALL/i)
@@ -106,6 +107,9 @@ for my $entry (@{$apiobj->{'entry'}})
 					my @subs = get_subscriptions($sender_id);
 					if($unsub)
 					{
+						# TODO: unsubscribe like exclusion
+						# subs system.*
+						# ubsubs system.beta.*
 						my $new_topic_patterns = [];
 						for my $topic_pattern (@subs)
 						{

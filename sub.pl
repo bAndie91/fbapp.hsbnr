@@ -166,6 +166,7 @@ sub partitions
 	my $s = shift;
 	my $len = shift;
 	my @parts;
+	# TODO partitionize on line boundaries
 	while(length $s)
 	{
 		push @parts, substr $s, 0, $len;
@@ -177,6 +178,21 @@ sub partitions
 sub datetime_iso8601
 {
 	return POSIX::strftime('%FT%TZ%z', localtime);
+}
+
+sub hash_of_delimited_strings_to_nested_hash
+{
+	sub dive_val :lvalue {
+		my $p = \shift;
+		$p = \( ($$p)->{$_} ) for @_;
+		return $p;
+	}
+	my $hashref = {};
+	for my $key (keys $_[0])
+	{
+		${dive_val($hashref, split /\./, $key)} = $_[0]->{$key};
+	}
+	return $hashref;
 }
 
 1;
