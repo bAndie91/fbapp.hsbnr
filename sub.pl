@@ -121,6 +121,9 @@ sub send_message
 		$send_message_user_agent = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0, });
 	}
 	
+	$msgobj->{'messaging_type'} = 'MESSAGE_TAG';
+	$msgobj->{'tag'} = 'COMMUNITY_ALERT';
+	
 	my $url = "$ini{'api'}{'BaseURL'}/me/messages?access_token=$ini{'api'}{'PageAccessToken'}";
 	my $resp;
 	for my $chunk ($opt{'parts'} ? (partitions($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
