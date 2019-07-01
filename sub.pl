@@ -179,12 +179,13 @@ sub partitions
 		if(length $boundary_char)
 		{
 			$pos = rindex $remaining_str, $boundary_char;
-			if($pos >= 0)
+			if($pos > 0)
 			{
 				$chunk = substr $remaining_str, 0, $pos;
 			}
 		}
-		push @parts, $chunk;
+		if(length $boundary_char and $chunk eq $boundary_char) { 1; }
+		else { push @parts, $chunk; }
 		$remaining_str = substr $remaining_str, length $chunk;
 	}
 	return @parts;
