@@ -123,6 +123,8 @@ sub cb_data
 		}
 	}
 	
+	$appsecret_proof = appsecret_proof();
+	
 	$all_count = scalar keys $notifications;
 	for my $uid (keys $notifications)
 	{

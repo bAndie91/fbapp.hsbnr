@@ -2,6 +2,7 @@
 use Data::Dumper;
 use LWP::UserAgent;
 use Carp;
+use Digest::SHA qw/hmac_sha256_hex/;
 
 
 sub expand_topics
@@ -124,7 +125,7 @@ sub send_message
 	$msgobj->{'messaging_type'} = 'MESSAGE_TAG';
 	$msgobj->{'tag'} = 'COMMUNITY_ALERT';
 	
-	my $url = "$ini{'api'}{'BaseURL'}/me/messages?access_token=$ini{'api'}{'PageAccessToken'}";
+	my $url = "$ini{'api'}{'BaseURL'}/me/messages?access_token=$ini{'api'}{'PageAccessToken'}&appsecret_proof=$appsecret_proof";
 	my $resp;
 	for my $chunk ($opt{'parts'} ? (partitions($msgobj->{'message'}->{'text'}, $ini{'api'}{'charlimit'})) : $msgobj->{'message'}->{'text'})
 	{
@@ -207,6 +208,11 @@ sub hash_of_delimited_strings_to_nested_hash
 		${dive_val($hashref, split /\./, $key)} = $_[0]->{$key};
 	}
 	return $hashref;
+}
+
+sub appsecret_proof
+{
+	return hmac_sha256_hex($ini{'api'}{'PageAccessToken'}, $ini{'api'}{'AppSecretKey'});
 }
 
 1;

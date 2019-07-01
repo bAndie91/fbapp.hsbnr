@@ -180,6 +180,8 @@ if($subscribers_changed)
 	update_ini();
 }
 
+$appsecret_proof = appsecret_proof();
+
 for my $response (@responses)
 {
 	send_message($response, {'parts'=>1});
