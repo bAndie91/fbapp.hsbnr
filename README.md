@@ -71,3 +71,6 @@ Separate multiple labels with comma to refer to multiple topics with one or more
      - `user.root.label.login`
  - `*`
    - matches to everything
+
+# issues
+Please submit issues via PR to some file `issue/TITLE.txt`.
